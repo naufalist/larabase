@@ -10,7 +10,7 @@ composer require kreait/firebase-php ^5.0
 2. Place the script into controller directory `App\Http\Controllers`
 3. Change this line with your Project's Service Account (private key) and move it to controller directory
 ```php
-->withServiceAccount(__DIR__.'/YOUR-FIREBASE-PROJECT-.json')
+->withServiceAccount(__DIR__.'/YOUR-FIREBASE-PROJECT-adminsdk.json')
 ->withDatabaseUri('https://YOUR-FIREBASE-PROJECT.firebaseio.com/');
 ```
 4. Add some route (using GET) to access each method. Example:
