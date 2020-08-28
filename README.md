@@ -17,7 +17,7 @@ composer require kreait/firebase-php ^5.0
 ```php
 Route::get('/signin', 'FirebaseController@signIn');
 ```
-4. Access route on your web browser. Example: [http://localhost:8000/signin](http://localhost:8000/signin)
+5. Access route on your web browser. Example: [http://localhost:8000/signin](http://localhost:8000/signin)
 
 ## Firebase Realtime Database
 ```json
