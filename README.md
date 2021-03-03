@@ -54,4 +54,4 @@ Route::get('/signin', 'FirebaseController@signIn');
 ## References
 
 * Laravel (**7.x**) - [laravel.com/docs](https://laravel.com/docs/7.x/)
-* Firebase Admin SDK for PHP  (**5.7.0**) - [firebase-php.readthedocs.io](http://firebase-php.readthedocs.io/en/5.7.0/)
+* Firebase Admin SDK for PHP  (**5.x**) *(< 5.15.0)* - [firebase-php.readthedocs.io](https://firebase-php.readthedocs.io/en/5.x/)
