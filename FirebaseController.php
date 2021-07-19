@@ -32,10 +32,16 @@ class FirebaseController extends Controller
             $newUser = $this->auth->createUserWithEmailAndPassword($email, $pass);
             dd($newUser);
         } catch (\Throwable $e) {
-            if ($e->getMessage() == "The email address is already in use by another account.") {
-                dd("email has been used");
-            } else {
-                dd($e->getMessage());
+            switch ($e->getMessage()) {
+                case 'The email address is already in use by another account.':
+                    dd("Email sudah digunakan.");
+                    break;
+                case 'A password must be a string with at least 6 characters.':
+                    dd("Kata sandi minimal 6 karakter.");
+                    break;
+                default:
+                    dd($e->getMessage());
+                    break;
             }
         }
     }
@@ -47,62 +53,91 @@ class FirebaseController extends Controller
 
         try {
             $signInResult = $this->auth->signInWithEmailAndPassword($email, $pass);
-            Session::put('uid', $signInResult->data()["localId"]);
-            Session::put('idTokenString', $signInResult->data()["idToken"]);
+            // dump($signInResult->data());
+
+            Session::put('firebaseUserId', $signInResult->firebaseUserId());
+            Session::put('idToken', $signInResult->idToken());
             Session::save();
-            dump(Session::get('uid'));
-            dump(Session::get('idTokenString'));
-            dump($signInResult);
+
+            dd($signInResult);
         } catch (\Throwable $e) {
-            if ($e->getMessage() == "INVALID_PASSWORD") {
-                dd("Invalid password");
-            } elseif ($e->getMessage() == "EMAIL_NOT_FOUND") {
-                dd("Email not found");
+            switch ($e->getMessage()) {
+                case 'INVALID_PASSWORD':
+                    dd("Kata sandi salah!.");
+                    break;
+                case 'EMAIL_NOT_FOUND':
+                    dd("Email tidak ditemukan.");
+                    break;
+                default:
+                    dd($e->getMessage());
+                    break;
             }
         }
     }
 
     public function signOut()
     {
-        $this->auth->revokeRefreshTokens(Session::get('uid'));
-
-        if ($this->userCheck() == "revoked") {
-            Session::forget('uid');
-            Session::forget('idTokenString');
+        if (Session::has('firebaseUserId') && Session::has('idToken')) {
+            // dd("User masih login.");
+            $this->auth->revokeRefreshTokens(Session::get('firebaseUserId'));
+            Session::forget('firebaseUserId');
+            Session::forget('idToken');
             Session::save();
-            dd("Successfully signed out");
+            dd("User berhasil logout.");
         } else {
-            dd("Sign out failed");
+            dd("User belum login.");
         }
     }
 
     public function userCheck()
     {
+        // $idToken = "";
+
+        // $this->auth->revokeRefreshTokens("");
+
+        // if (Session::has('firebaseUserId') && Session::has('idToken')) {
+        //     dd("User masih login.");
+        // } else {
+        //     dd("User sudah logout.");
+        // }
+
         try {
-            $verifiedIdToken = $this->auth->verifyIdToken(Session::get('idTokenString'), $checkIfRevoked = true);
-            $response = "valid";
-            // dd("Valid");
-            // $uid = $verifiedIdToken->getClaim('sub');
-            // $user = $auth->getUser($uid);
-            // dump($uid);
-            // dump($user);
-        } catch (\InvalidArgumentException $e) {
-            // dd('The token could not be parsed: '.$e->getMessage());
-            $response = "The token could not be parsed: ".$e->getMessage();
-        } catch (InvalidToken $e) {
-            // dd('The token is invalid: '.$e->getMessage());
-            $response = "The token is invalid: ".$e->getMessage();
-        } catch (RevokedIdToken $e) {
-            $response = "revoked";
+            $verifiedIdToken = $this->auth->verifyIdToken($idToken, $checkIfRevoked = true);
+            dump($verifiedIdToken);
+            dump($verifiedIdToken->claims()->get('sub')); // uid
+            dump($this->auth->getUser($verifiedIdToken->claims()->get('sub')));
         } catch (\Throwable $e) {
-            if (substr($e->getMessage(), 0, 21) == "This token is expired") {
-                $response = "expired";
-            } else {
-                $response = "something_wrong";
-            }
+            dd($e->getMessage());
         }
 
-        return $response;
+        // try {
+        //     $verifiedIdToken = $this->auth->verifyIdToken(Session::get('idToken'), $checkIfRevoked = true);
+        //     $response = "valid";
+        //     // dd("Valid");
+        //     // $uid = $verifiedIdToken->getClaim('sub');
+        //     // $user = $auth->getUser($uid);
+        //     // dump($uid);
+        //     // dump($user);
+        // } catch (\InvalidArgumentException $e) {
+        //     // dd('The token could not be parsed: '.$e->getMessage());
+        //     $response = "The token could not be parsed: " . $e->getMessage();
+        // } catch (InvalidToken $e) {
+        //     // dd('The token is invalid: '.$e->getMessage());
+        //     $response = "The token is invalid: " . $e->getMessage();
+        // } catch (RevokedIdToken $e) {
+        //     $response = "revoked";
+        // } catch (\Throwable $e) {
+        //     if (substr(
+        //         $e->getMessage(),
+        //         0,
+        //         21
+        //     ) == "This token is expired") {
+        //         $response = "expired";
+        //     } else {
+        //         $response = "something_wrong";
+        //     }
+        // }
+        // return $response;
     }
 
     public function read()
