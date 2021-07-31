@@ -45,8 +45,8 @@ Route::get('/signin', 'FirebaseController@signIn');
 ```
 
 ## Youtube Video
-Laravel (7.x): CRUD Firebase Realtime Database: https://youtu.be/-JalSwQuTdY
-Laravel (7.x): Firebase Authentication with Email and Password: https://youtu.be/NKbvnOy5_wg
+* Laravel (7.x): CRUD Firebase Realtime Database: https://youtu.be/-JalSwQuTdY
+* Laravel (7.x): Firebase Authentication with Email and Password: https://youtu.be/NKbvnOy5_wg
 
 ## Notes
 - `PHP`: **>= 7.2**
